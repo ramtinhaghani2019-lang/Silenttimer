@@ -14,23 +14,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Java
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
-      - name: Extract
-        run: unzip -o Nexa_5.2_GitHub_Ready.zip -d nexa
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
 
-      - name: Build
+      - name: Extract Nexa 5.2
         run: |
-          cd nexa
-          chmod +x gradlew
-          ./gradlew clean assembleDebug
+          rm -rf nexa
+          mkdir nexa
+          unzip -o Nexa_5.2_GitHub_Ready.zip -d nexa
 
-      - name: Upload
+      - name: Build Nexa 5.2
+        working-directory: nexa
+        run: gradle --no-daemon clean assembleDebug
+
+      - name: Upload Nexa 5.2 APK
         uses: actions/upload-artifact@v4
         with:
           name: Nexa-5.2-APK
-          path: nexa/app/build/outputs/apk/debug/*.apk
+          path: nexa/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
