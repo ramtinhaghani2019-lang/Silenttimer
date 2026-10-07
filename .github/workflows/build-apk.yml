@@ -11,46 +11,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Java 17
+      - name: Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
-      - name: Extract Nexa source
+      - name: Extract
+        run: unzip -o Nexa_5.2_GitHub_Ready.zip -d nexa
+
+      - name: Build
         run: |
-          rm -rf nexa_build
-          mkdir nexa_build
-          unzip -o Nexa_5.2_GitHub_Ready.zip -d nexa_build
+          cd nexa
+          chmod +x gradlew
+          ./gradlew clean assembleDebug
 
-      - name: Find project
-        run: |
-          find nexa_build -name settings.gradle -o -name settings.gradle.kts
-          find nexa_build -maxdepth 3 -type f | head -100
-
-      - name: Build APK
-        run: |
-          cd nexa_build
-
-          if [ -f gradlew ]; then
-            chmod +x gradlew
-            ./gradlew clean assembleDebug
-          elif [ -f settings.gradle ] || [ -f settings.gradle.kts ]; then
-            gradle clean assembleDebug
-          else
-            PROJECT_DIR=$(find . -name settings.gradle -o -name settings.gradle.kts | head -n 1 | xargs dirname)
-            echo "Project found at: $PROJECT_DIR"
-            cd "$PROJECT_DIR"
-
-            if [ -f gradlew ]; then
-              chmod +x gradlew
-              ./gradlew clean assembleDebug
-            else
-              gradle clean assembleDebug
-            fi
-          fi
-
-      -
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: Nexa-5.2-APK
+          path: nexa/app/build/outputs/apk/debug/*.apk
