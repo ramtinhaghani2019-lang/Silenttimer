@@ -1,10 +1,13 @@
-name: Build Silent Timer APK
+name: Build Nexa 5.2 APK
 
 on:
   workflow_dispatch:
   push:
     branches:
       - main
+    paths:
+      - "Nexa_5.2_GitHub_Ready.zip"
+      - ".github/workflows/build-apk.yml"
 
 jobs:
   build:
@@ -20,24 +23,21 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Gradle 8.9
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "8.9"
+      - name: Install unzip
+        run: sudo apt-get update && sudo apt-get install -y unzip
 
-      - name: Extract project
+      - name: Extract Nexa 5.2 source
         run: |
-          mkdir project
-          unzip -q SilentTimer_GitHub_Ready.zip -d project
+          rm -rf nexa_build
+          mkdir -p nexa_build
+          unzip -o Nexa_5.2_GitHub_Ready.zip -d nexa_build
 
-      - name: Build APK
+      - name: Show extracted files
         run: |
-          cd project
-          gradle --no-daemon assembleDebug
+          echo "=== Extracted content ==="
+          find nexa_build -maxdepth 3 -type f | sort | head -200
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: SilentTimer-APK
-          path: project/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
+      - name: Find Android project
+        id: project
+        shell: bash
+        run
