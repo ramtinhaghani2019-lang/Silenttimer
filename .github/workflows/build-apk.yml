@@ -5,9 +5,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "Nexa_5.2_GitHub_Ready.zip"
-      - ".github/workflows/build-apk.yml"
 
 jobs:
   build:
@@ -23,21 +20,37 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Install unzip
-        run: sudo apt-get update && sudo apt-get install -y unzip
-
-      - name: Extract Nexa 5.2 source
+      - name: Extract Nexa source
         run: |
           rm -rf nexa_build
-          mkdir -p nexa_build
+          mkdir nexa_build
           unzip -o Nexa_5.2_GitHub_Ready.zip -d nexa_build
 
-      - name: Show extracted files
+      - name: Find project
         run: |
-          echo "=== Extracted content ==="
-          find nexa_build -maxdepth 3 -type f | sort | head -200
+          find nexa_build -name settings.gradle -o -name settings.gradle.kts
+          find nexa_build -maxdepth 3 -type f | head -100
 
-      - name: Find Android project
-        id: project
-        shell: bash
-        run
+      - name: Build APK
+        run: |
+          cd nexa_build
+
+          if [ -f gradlew ]; then
+            chmod +x gradlew
+            ./gradlew clean assembleDebug
+          elif [ -f settings.gradle ] || [ -f settings.gradle.kts ]; then
+            gradle clean assembleDebug
+          else
+            PROJECT_DIR=$(find . -name settings.gradle -o -name settings.gradle.kts | head -n 1 | xargs dirname)
+            echo "Project found at: $PROJECT_DIR"
+            cd "$PROJECT_DIR"
+
+            if [ -f gradlew ]; then
+              chmod +x gradlew
+              ./gradlew clean assembleDebug
+            else
+              gradle clean assembleDebug
+            fi
+          fi
+
+      -
