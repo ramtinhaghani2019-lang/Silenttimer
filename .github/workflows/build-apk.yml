@@ -31,19 +31,47 @@ jobs:
           mkdir nexa
           unzip -o Nexa_Latest_GitHub_Ready.zip -d nexa
 
+      - name: Find Nexa project root
+        id: project
+        run: |
+          PROJECT_DIR=$(find nexa -type f -name settings.gradle -printf '%h\n' | head -1)
+
+          if [ -z "$PROJECT_DIR" ]; then
+            PROJECT_DIR=$(find nexa -type f -name settings.gradle.kts -printf '%h\n' | head -1)
+          fi
+
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "Could not find settings.gradle or settings.gradle.kts"
+            find nexa -maxdepth 3 -type f | sort
+            exit 1
+          fi
+
+          echo "dir=$PROJECT_DIR" >> "$GITHUB_OUTPUT"
+          echo "Project root: $PROJECT_DIR"
+
       - name: Build Nexa
-        working-directory: nexa
+        working-directory: ${{ steps.project.outputs.dir }}
         run: gradle --no-daemon clean assembleDebug
 
       - name: Read app version
         id: version
+        working-directory: ${{ steps.project.outputs.dir }}
         run: |
-          VERSION=$(grep -oP 'versionName\s+"\K[^"]+' nexa/app/build.gradle | head -1)
+          VERSION=$(sed -n 's/.*versionName[[:space:]]*["'\'']\([^"'\'']*\)["'\''].*/\1/p' app/build.gradle | head -1)
+
+          if [ -z "$VERSION" ] && [ -f app/build.gradle.kts ]; then
+            VERSION=$(sed -n 's/.*versionName[[:space:]]*=[[:space:]]*["'\'']\([^"'\'']*\)["'\''].*/\1/p' app/build.gradle.kts | head -1)
+          fi
+
+          if [ -z "$VERSION" ]; then
+            VERSION="unknown"
+          fi
+
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Upload Nexa APK
         uses: actions/upload-artifact@v4
         with:
           name: Nexa-${{ steps.version.outputs.version }}-APK
-          path: nexa/app/build/outputs/apk/debug/app-debug.apk
+          path: ${{ steps.project.outputs.dir }}/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
