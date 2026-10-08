@@ -1,4 +1,4 @@
-name: Build Nexa 5.2 APK
+name: Build Nexa 5.3.5 APK
 
 on:
   workflow_dispatch:
@@ -25,19 +25,19 @@ jobs:
         with:
           gradle-version: "8.9"
 
-      - name: Extract Nexa 5.2
+      - name: Extract Nexa 5.3.5
         run: |
           rm -rf nexa
           mkdir nexa
-          unzip -o Nexa_5.2_GitHub_Ready.zip -d nexa
+          unzip -o Nexa_5.3.5_GitHub_Ready_FINAL.zip -d nexa
 
-      - name: Build Nexa 5.2
+      - name: Build Nexa 5.3.5
         working-directory: nexa
         run: gradle --no-daemon clean assembleDebug
 
-      - name: Upload Nexa 5.2 APK
+      - name: Upload Nexa 5.3.5 APK
         uses: actions/upload-artifact@v4
         with:
-          name: Nexa-5.2-APK
+          name: Nexa-5.3.5-APK
           path: nexa/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
