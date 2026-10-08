@@ -25,11 +25,11 @@ jobs:
         with:
           gradle-version: "8.9"
 
-      - name: Extract Nexa 5.3.5 FIXED
+      - name: Extract Nexa 5.3.5 FIXED2
         run: |
           rm -rf nexa
           mkdir nexa
-          unzip -o Nexa_5.3.5_GitHub_Ready_FINAL_FIXED.zip -d nexa
+          unzip -o Nexa_5.3.5_GitHub_Ready_FINAL_FIXED2.zip -d nexa
 
       - name: Build Nexa 5.3.5
         working-directory: nexa
