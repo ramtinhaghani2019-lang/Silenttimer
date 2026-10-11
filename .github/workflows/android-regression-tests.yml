@@ -13,6 +13,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Extract Nexa source
+        run: |
+          rm -rf nexa-test-source
+          mkdir nexa-test-source
+          unzip -q Nexa_Latest_GitHub_Ready.zip -d nexa-test-source
+          echo "Extracted Nexa source:"
+          ls -la nexa-test-source
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -35,6 +43,7 @@ jobs:
           arch: x86_64
           profile: pixel_6
           disable-animations: true
+          working-directory: nexa-test-source
           script: gradle --no-daemon connectedDebugAndroidTest
 
       - name: Upload Android test reports
@@ -43,6 +52,6 @@ jobs:
         with:
           name: Nexa-Android-Test-Reports
           path: |
-            app/build/reports/androidTests/**
-            app/build/outputs/androidTest-results/**
+            nexa-test-source/app/build/reports/androidTests/**
+            nexa-test-source/app/build/outputs/androidTest-results/**
           if-no-files-found: warn
