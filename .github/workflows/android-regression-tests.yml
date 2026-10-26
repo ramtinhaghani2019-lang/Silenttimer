@@ -5,6 +5,9 @@ on:
   push:
     branches: [main, master]
 
+permissions:
+  contents: read
+
 jobs:
   emulator-regression:
     runs-on: ubuntu-latest
@@ -12,6 +15,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Check source signing security
+        run: python3 tools/check_source_security.py
 
       - name: Extract Nexa source
         run: |
@@ -44,7 +50,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           working-directory: nexa-test-source
-          script: gradle --no-daemon -Pandroid.useAndroidX=true connectedDebugAndroidTest
+          script: gradle --no-daemon -Pandroid.useAndroidX=true -PnexaRegressionOnly=true connectedDebugAndroidTest
 
       - name: Upload Android test reports
         if: always()

@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,6 +16,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Check source signing security
+        run: python3 tools/check_source_security.py
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -49,9 +55,33 @@ jobs:
           echo "dir=$PROJECT_DIR" >> "$GITHUB_OUTPUT"
           echo "Project root: $PROJECT_DIR"
 
+      - name: Restore private signing key
+        env:
+          NEXA_KEYSTORE_BASE64: ${{ secrets.NEXA_KEYSTORE_BASE64 }}
+          NEXA_STORE_PASSWORD: ${{ secrets.NEXA_STORE_PASSWORD }}
+          NEXA_KEY_ALIAS: ${{ secrets.NEXA_KEY_ALIAS }}
+          NEXA_KEY_PASSWORD: ${{ secrets.NEXA_KEY_PASSWORD }}
+        run: |
+          set -eu
+          if [ -z "$NEXA_KEYSTORE_BASE64" ] || [ -z "$NEXA_STORE_PASSWORD" ] || [ -z "$NEXA_KEY_ALIAS" ] || [ -z "$NEXA_KEY_PASSWORD" ]; then
+            echo "::error::Configure the four NEXA signing secrets before building an installable update."
+            exit 1
+          fi
+          umask 077
+          printf '%s' "$NEXA_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/nexa-signing.jks"
+
       - name: Build Nexa
         working-directory: ${{ steps.project.outputs.dir }}
+        env:
+          NEXA_KEYSTORE_PATH: ${{ runner.temp }}/nexa-signing.jks
+          NEXA_STORE_PASSWORD: ${{ secrets.NEXA_STORE_PASSWORD }}
+          NEXA_KEY_ALIAS: ${{ secrets.NEXA_KEY_ALIAS }}
+          NEXA_KEY_PASSWORD: ${{ secrets.NEXA_KEY_PASSWORD }}
         run: gradle --no-daemon clean assembleDebug
+
+      - name: Remove private signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/nexa-signing.jks"
 
       - name: Read app version
         id: version
