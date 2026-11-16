@@ -26,6 +26,17 @@ replace_once('    @Override protected void onCreate(Bundle b){super.onCreate(b);
             requestAssetsUnlock();
             return;
         }''')
+replace_once('list.postDelayed(()->editForm(null),250);', '''list.postDelayed(()->{
+                if(isFinishing() || isDestroyed())return;
+                if(NexaStore.lockEnabled(this) && !SecurityGate.isUnlocked())return;
+                editForm(null);
+            },250);''')
+replace_once('if(shared!=null)list.post(()->readReceiptFromImage(shared));', '''if(shared!=null)list.post(()->{
+                if(isFinishing() || isDestroyed())return;
+                if(NexaStore.lockEnabled(this) && !SecurityGate.isUnlocked())return;
+                readReceiptFromImage(shared);
+            });''')
+
 replace_once('        build();\n        if(restoredPage!=null){', '        build();\n        assetsUiReady=true;\n        if(restoredPage!=null){')
 replace_once('''        super.onActivityResult(request,resultCode,data);
         if(request==REQUEST_RECEIPT_IMAGE''', '''        super.onActivityResult(request,resultCode,data);
