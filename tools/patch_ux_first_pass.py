@@ -52,7 +52,7 @@ once("QuickAddActivity.java",
 # Alert rules are shared across several editors; confirm removal to prevent mis-taps.
 once("AlertEditor.java",
     'Button del=UiKit.deleteIconButton(c);del.setOnClickListener(v->{data.remove(r);renderRows();});line.addView(del,new LinearLayout.LayoutParams(UiKit.dp(c,48),UiKit.dp(c,48)));',
-    '''Button del=UiKit.deleteIconButton(c);del.setOnClickListener(v->new AlertDialog.Builder(c)
+    '''Button del=UiKit.deleteIconButton(c);del.setOnClickListener(v->new android.app.AlertDialog.Builder(c)
                 .setTitle("حذف این هشدار؟")
                 .setMessage(label(r))
                 .setNegativeButton("انصراف",null)
