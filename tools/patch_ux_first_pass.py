@@ -29,4 +29,18 @@ once("TodayActivity.java",
                     android.widget.Toast.makeText(this,"یادداشت پاک شد.",android.widget.Toast.LENGTH_SHORT).show();
                 }).show();
         });''')
+# Clearing recent shortcuts should be reversible by cancelling; actual saved data is untouched.
+once("QuickAddActivity.java",
+    '''clear.setOnClickListener(v->{
+            getSharedPreferences(RECENT_PREFS,MODE_PRIVATE).edit().remove(RECENT_KEY).apply();
+            build();
+        });''',
+    '''clear.setOnClickListener(v->new android.app.AlertDialog.Builder(this)
+            .setTitle("پاک کردن مسیرهای اخیر؟")
+            .setMessage("فقط فهرست دسترسی‌های اخیر پاک می‌شود؛ اطلاعات شما باقی می‌ماند.")
+            .setNegativeButton("انصراف",null)
+            .setPositiveButton("پاک کردن",(dialog,which)->{
+                getSharedPreferences(RECENT_PREFS,MODE_PRIVATE).edit().remove(RECENT_KEY).apply();
+                build();
+            }).show());''')
 print("PASS: UX patch applied")
