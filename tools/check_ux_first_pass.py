@@ -11,4 +11,8 @@ assert 'setTitle("پاک کردن یادداشت؟")' in today
 assert '.setNegativeButton("انصراف",null)' in today
 assert 'NexaStore.setUnlockNote(this,"");noteDraft="";note.setText("");' in today
 assert 'setPositiveButton("پاک کردن"' in today
-print("PASS: 8 UX regression assertions")
+assert 'setTitle("پاک کردن مسیرهای اخیر؟")' in quick
+assert 'اطلاعات شما باقی می‌ماند.' in quick
+assert 'getSharedPreferences(RECENT_PREFS,MODE_PRIVATE).edit().remove(RECENT_KEY).apply();' in quick
+assert quick.count('.setNegativeButton("انصراف",null)') == 1
+print("PASS: 12 UX regression assertions")
