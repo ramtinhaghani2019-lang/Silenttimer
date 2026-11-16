@@ -14,8 +14,8 @@ checks = {
     "unauthorized entry stops before quick-add": source.index("requestAssetsUnlock();") < source.index('if(getIntent().getBooleanExtra("quick_add",false))'),
     "unauthorized entry stops before shared-image processing": source.index("requestAssetsUnlock();") < source.index("if(Intent.ACTION_SEND.equals(getIntent().getAction())"),
     "resume guard precedes receiver registration": source.split("void onResume(", 1)[1].index("requestAssetsUnlock();") < source.split("void onResume(", 1)[1].index("registerReceiver("),
-    "delayed quick-add checks session": "if(NexaStore.lockEnabled(this) && !SecurityGate.isUnlocked())return;\\n                editForm(null);" in source,
-    "deferred shared image checks session": "if(NexaStore.lockEnabled(this) && !SecurityGate.isUnlocked())return;\\n                readReceiptFromImage(shared);" in source,
+    "delayed quick-add checks session": "if(NexaStore.lockEnabled(this) && !SecurityGate.isUnlocked())return;\n                editForm(null);" in source,
+    "deferred shared image checks session": "if(NexaStore.lockEnabled(this) && !SecurityGate.isUnlocked())return;\n                readReceiptFromImage(shared);" in source,
     "cancelled unlock finishes activity": "else finish();" in source.split("if(request==REQUEST_ASSETS_UNLOCK)", 1)[1].split("return;",1)[0],
 
 }
