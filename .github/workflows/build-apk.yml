@@ -37,6 +37,9 @@ jobs:
           mkdir nexa
           unzip -o Nexa_Latest_GitHub_Ready.zip -d nexa
 
+      - name: Apply AssetsActivity PIN entry guard
+        run: python3 tools/patch_assets_pin_guard.py
+
       - name: Find Nexa project root
         id: project
         run: |
