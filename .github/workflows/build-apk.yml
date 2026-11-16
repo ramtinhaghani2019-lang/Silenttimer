@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - fix/assets-pin-entry-guard-20261116
 
 permissions:
   contents: read
@@ -36,6 +37,12 @@ jobs:
           rm -rf nexa
           mkdir nexa
           unzip -o Nexa_Latest_GitHub_Ready.zip -d nexa
+
+      - name: Apply AssetsActivity PIN entry guard
+        working-directory: nexa
+        run: |
+          python3 ../tools/patch_assets_pin_guard.py
+          python3 ../tools/check_assets_pin_guard.py
 
       - name: Find Nexa project root
         id: project
