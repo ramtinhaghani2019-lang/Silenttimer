@@ -20,7 +20,7 @@ with tempfile.TemporaryDirectory(prefix="nexa-ux-preflight-") as temp:
     tools = Path(__file__).resolve().parent
     subprocess.run([sys.executable, str(tools / "patch_ux_first_pass.py")], cwd=temp_root, check=True)
     subprocess.run([sys.executable, str(tools / "check_ux_first_pass.py")], cwd=temp_root, check=True)
-    # Verify every patch remains deterministic when re-run against the same base.
+    # Confirm the patched copies are nonempty; source archive stays unchanged.
     first = {name: (target / name).read_bytes() for name in required}
     if any(not first[name] for name in required):
         raise SystemExit("ERROR: patched source is empty")
