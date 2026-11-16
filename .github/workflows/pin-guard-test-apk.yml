@@ -34,6 +34,8 @@ jobs:
         run: |
           python3 ../tools/patch_assets_pin_guard.py
           python3 ../tools/check_assets_pin_guard.py
+      - name: Preflight UX changes on clean disposable sources
+        run: python3 tools/preflight_ux.py nexa
       - name: Apply and verify consolidated UX changes
         working-directory: nexa
         run: |
