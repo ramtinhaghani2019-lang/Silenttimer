@@ -2,13 +2,18 @@
 from pathlib import Path
 
 root = Path("app/src/main/java/com/example/silenttimer")
+pending = {}
 
 def once(path, before, after):
+    """Stage exact source edits; do not write until all matches are verified."""
     p = root / path
-    src = p.read_text(encoding="utf-8")
-    if src.count(before) != 1:
-        raise SystemExit(f"Expected one exact match in {path}, found {src.count(before)}")
-    p.write_text(src.replace(before, after, 1), encoding="utf-8")
+    src = pending.get(p)
+    if src is None:
+        src = p.read_text(encoding="utf-8")
+    matches = src.count(before)
+    if matches != 1:
+        raise SystemExit(f"Expected one exact match in {path}, found {matches}")
+    pending[p] = src.replace(before, after, 1)
 
 # Remove nonessential instructional copy; keep all routes and controls.
 once("QuickAddActivity.java",
@@ -43,4 +48,7 @@ once("QuickAddActivity.java",
                 getSharedPreferences(RECENT_PREFS,MODE_PRIVATE).edit().remove(RECENT_KEY).apply();
                 build();
             }).show());''')
-print("PASS: UX patch applied")
+# Commit only after every expected source fragment has been validated.
+for path, content in pending.items():
+    path.write_text(content, encoding="utf-8")
+print(f"PASS: UX patch applied to {len(pending)} source files")
