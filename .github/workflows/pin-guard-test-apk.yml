@@ -34,6 +34,11 @@ jobs:
         run: |
           python3 ../tools/patch_assets_pin_guard.py
           python3 ../tools/check_assets_pin_guard.py
+      - name: Apply and verify consolidated UX changes
+        working-directory: nexa
+        run: |
+          python3 ../tools/patch_ux_first_pass.py
+          python3 ../tools/check_ux_first_pass.py
       - name: Inventory UI screens and labels
         run: python3 tools/audit_ui_inventory.py nexa
       - name: Upload UX inventory
