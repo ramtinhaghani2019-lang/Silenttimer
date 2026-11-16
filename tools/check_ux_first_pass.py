@@ -15,4 +15,8 @@ assert 'setTitle("پاک کردن مسیرهای اخیر؟")' in quick
 assert 'اطلاعات شما باقی می‌ماند.' in quick
 assert 'getSharedPreferences(RECENT_PREFS,MODE_PRIVATE).edit().remove(RECENT_KEY).apply();' in quick
 assert quick.count('.setNegativeButton("انصراف",null)') == 1
-print("PASS: 12 UX regression assertions")
+patch = Path(__file__).with_name("patch_ux_first_pass.py").read_text(encoding="utf-8")
+assert "pending[p] = src.replace(before, after, 1)" in patch
+assert "for path, content in pending.items():" in patch
+assert patch.index("for path, content in pending.items():") > patch.index('once("QuickAddActivity.java",', patch.index('once("TodayActivity.java",'))
+print("PASS: 15 UX regression assertions")
