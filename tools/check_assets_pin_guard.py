@@ -11,6 +11,11 @@ checks = {
     "receiver cleanup is guarded": "if(marketReceiverRegistered){" in source,
     "UI build is gated": source.index("if(NexaStore.lockEnabled(this) && !SecurityGate.isUnlocked())") < source.index("        build();"),
     "image result is gated": "if(NexaStore.lockEnabled(this) && !SecurityGate.isUnlocked())return;" in source.split("void onActivityResult(", 1)[1],
+    "unauthorized entry stops before quick-add": source.index("requestAssetsUnlock();") < source.index('if(getIntent().getBooleanExtra("quick_add",false))'),
+    "unauthorized entry stops before shared-image processing": source.index("requestAssetsUnlock();") < source.index("if(Intent.ACTION_SEND.equals(getIntent().getAction())"),
+    "resume guard precedes receiver registration": source.split("void onResume(", 1)[1].index("requestAssetsUnlock();") < source.split("void onResume(", 1)[1].index("registerReceiver("),
+    "cancelled unlock finishes activity": "else finish();" in source.split("if(request==REQUEST_ASSETS_UNLOCK)", 1)[1].split("return;",1)[0],
+
 }
 for name, ok in checks.items():
     print(("PASS" if ok else "FAIL") + ": " + name)
