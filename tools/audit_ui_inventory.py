@@ -15,6 +15,22 @@ for p in java:
     source = p.read_text(encoding="utf-8", errors="replace")
     if re.search(r"\bextends\s+(?:AppCompatActivity|Activity|ComponentActivity)\b", source):
         activities.append(str(p.relative_to(root)))
+
+java_indicators = Counter()
+java_review_candidates = []
+for p in java:
+    source = p.read_text(encoding="utf-8", errors="replace")
+    indicators = {
+        "click_listeners": source.count(".setOnClickListener("),
+        "dialog_builders": source.count("AlertDialog.Builder("),
+        "text_setters": source.count(".setText("),
+        "hint_setters": source.count(".setHint("),
+        "content_descriptions": source.count(".setContentDescription("),
+    }
+    java_indicators.update(indicators)
+    if indicators["click_listeners"] or indicators["text_setters"]:
+        java_review_candidates.append({"source": str(p.relative_to(root)), **indicators})
+
 labels = Counter()
 for p in xml:
     source = p.read_text(encoding="utf-8", errors="replace")
@@ -26,8 +42,10 @@ result = {
     "activity_count": len(activities),
     "activities": activities,
     "layout_count": len(xml),
+    "java_indicators": dict(java_indicators),
+    "java_review_candidates": sorted(java_review_candidates, key=lambda x: (-x["click_listeners"], x["source"])),
     "layout_indicators": dict(labels),
-    "note": "Inventory only. Hardcoded text and clickable counts are review indicators, not confirmed defects."
+    "note": "Inventory only. Java and XML counts are review indicators, not confirmed defects."
 }
 Path("nexa-ux-inventory.json").write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
 print(f"UI inventory: {len(activities)} activities, {len(xml)} XML layouts")
