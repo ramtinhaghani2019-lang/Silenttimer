@@ -7,7 +7,7 @@ import tempfile
 
 source_root = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path("nexa").resolve()
 package = Path("app/src/main/java/com/example/silenttimer")
-required = ("QuickAddActivity.java", "TodayActivity.java")
+required = ("QuickAddActivity.java", "TodayActivity.java", "AlertEditor.java")
 with tempfile.TemporaryDirectory(prefix="nexa-ux-preflight-") as temp:
     temp_root = Path(temp)
     target = temp_root / package
