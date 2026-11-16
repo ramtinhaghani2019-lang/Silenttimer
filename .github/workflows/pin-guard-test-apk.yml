@@ -3,6 +3,7 @@ name: Nexa PIN Guard Test APK
 on:
   push:
     branches:
+      - main
       - fix/assets-pin-entry-guard-20261116
   workflow_dispatch:
 
