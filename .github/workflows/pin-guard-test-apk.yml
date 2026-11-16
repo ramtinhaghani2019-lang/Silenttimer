@@ -41,6 +41,8 @@ jobs:
         run: |
           python3 ../tools/patch_ux_first_pass.py
           python3 ../tools/check_ux_first_pass.py
+      - name: Self-test Java and XML inventory
+        run: python3 tools/test_audit_ui_inventory.py
       - name: Inventory UI screens and labels
         run: python3 tools/audit_ui_inventory.py nexa
       - name: Upload UX inventory
