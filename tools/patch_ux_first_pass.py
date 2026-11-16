@@ -48,6 +48,17 @@ once("QuickAddActivity.java",
                 getSharedPreferences(RECENT_PREFS,MODE_PRIVATE).edit().remove(RECENT_KEY).apply();
                 build();
             }).show());''')
+
+# Alert rules are shared across several editors; confirm removal to prevent mis-taps.
+once("AlertEditor.java",
+    'Button del=UiKit.deleteIconButton(c);del.setOnClickListener(v->{data.remove(r);renderRows();});line.addView(del,new LinearLayout.LayoutParams(UiKit.dp(c,48),UiKit.dp(c,48)));',
+    '''Button del=UiKit.deleteIconButton(c);del.setOnClickListener(v->new AlertDialog.Builder(c)
+                .setTitle("حذف این هشدار؟")
+                .setMessage(label(r))
+                .setNegativeButton("انصراف",null)
+                .setPositiveButton("حذف",(dialog,which)->{data.remove(r);renderRows();})
+                .show());line.addView(del,new LinearLayout.LayoutParams(UiKit.dp(c,48),UiKit.dp(c,48)));''')
+
 # Commit only after every expected source fragment has been validated.
 for path, content in pending.items():
     path.write_text(content, encoding="utf-8")
