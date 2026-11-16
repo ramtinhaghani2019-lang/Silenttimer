@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - fix/assets-pin-entry-guard-20261116
+      - improve/ux-consistency-stability-20261116
   workflow_dispatch:
 
 permissions:
@@ -33,6 +34,14 @@ jobs:
         run: |
           python3 ../tools/patch_assets_pin_guard.py
           python3 ../tools/check_assets_pin_guard.py
+      - name: Inventory UI screens and labels
+        run: python3 tools/audit_ui_inventory.py nexa
+      - name: Upload UX inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: Nexa-UX-Inventory
+          path: nexa-ux-inventory.json
+          if-no-files-found: error
       - name: Find Gradle project
         id: project
         run: |
